@@ -6,7 +6,9 @@ import cookieParser from 'cookie-parser';
 import session from 'express-session';
 // import FileStore from 'session-file-store';
 import MongoStore from 'connect-mongo'
-//? Personalizados 
+//? Passport
+import passport from 'passport';
+//? Customize 
 import { __dirname } from './utils.js';
 import './dbConfig.js'
 import productsRouter from './routes/products.router.js'
@@ -15,7 +17,7 @@ import messagesRouter from './routes/messages.router.js'
 import viewsRouter from './routes/views.router.js'
 import usersRouter from './routes/users.router.js'
 import { messagesModel } from './dao/models/messages.model.js';
-
+import './passport/passportStrategies.js'
 
 const app = express()
 
@@ -25,7 +27,14 @@ app.use(express.urlencoded({ extended: true }))
 app.use(express.static(__dirname + '/public'))
 app.use(cookieParser())
 
-//? Session Mongo
+
+//? Handlebars
+app.engine('handlebars', handlebars.engine())
+app.set('views', __dirname + '/views')
+app.set('view engine', 'handlebars')
+
+
+//? Mongo session
 app.use(
     session({
         store:MongoStore.create({
@@ -37,10 +46,13 @@ app.use(
         cookie: { max: 60000 }
     }))
 
-//? Handlebars
-app.engine('handlebars', handlebars.engine())
-app.set('views', __dirname + '/views')
-app.set('view engine', 'handlebars')
+    //? Passport setup
+    // Inicializar 
+    app.use(passport.initialize())
+    // Passport guardara info de session
+    app.use(passport.session()) 
+
+
 
 //? Rutas
 app.use('/api/products', productsRouter)
@@ -53,8 +65,6 @@ app.use('/users', usersRouter)
 app.get('/', (req, res) => {
     res.redirect('/views/login')
 })
-
-
 
 
 const PORT = 8080
