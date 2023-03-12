@@ -35,7 +35,7 @@ router.get('/products', async (req, res) => {
 router.post('/registro', passport.authenticate('registro', {
     failureRedirect: '/views/errorRegistro',
     // successRedirect: '/views/products',
-    passReqToCallback: true
+    // passReqToCallback: true
 }, (req, res) => {
     res.redirect('/views/products')
 })
@@ -94,7 +94,7 @@ router.put('/changePassword', async (req, res) => {
 // LOGIN GITHUB
 router.get('/registroGithub', passport.authenticate('githubRegistro', { scope: ['user:email'] }))
 router.get('/github', passport.authenticate('githubRegistro', { failureRedirect: '/views/errorRegistro' }), async (req, res) => {
-    req.session.email = res.user.email
+    req.session.email = req.user.email
     res.redirect('/views/products')
 })
 
